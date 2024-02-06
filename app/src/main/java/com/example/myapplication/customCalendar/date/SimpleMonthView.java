@@ -16,11 +16,13 @@
 
 package com.example.myapplication.customCalendar.date;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 
+@SuppressLint("ViewConstructor")
 public class SimpleMonthView extends MonthView {
 
     public SimpleMonthView(Context context, AttributeSet attr, DatePickerController controller) {
@@ -31,7 +33,7 @@ public class SimpleMonthView extends MonthView {
     public void drawMonthDay(Canvas canvas, int year, int month, int day,
                              int x, int y, int startX, int stopX, int startY, int stopY) {
         if (mSelectedDay == day) {
-            canvas.drawCircle(x, y - (MINI_DAY_NUMBER_TEXT_SIZE / 3), DAY_SELECTED_CIRCLE_SIZE,
+            canvas.drawCircle(x, y - ((float) MINI_DAY_NUMBER_TEXT_SIZE / 3), DAY_SELECTED_CIRCLE_SIZE,
                     mSelectedCirclePaint);
         }
 

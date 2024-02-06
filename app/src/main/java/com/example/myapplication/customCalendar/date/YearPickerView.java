@@ -16,6 +16,7 @@
 
 package com.example.myapplication.customCalendar.date;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.StateListDrawable;
@@ -35,11 +36,12 @@ import com.example.myapplication.R;
 /**
  * Displays a selectable list of years.
  */
+@SuppressLint("ViewConstructor")
 public class YearPickerView extends ListView implements OnItemClickListener, DatePickerDialog.OnDateChangedListener {
     private final DatePickerController mController;
     private YearAdapter mAdapter;
-    private int mViewSize;
-    private int mChildSize;
+    private final int mViewSize;
+    private final int mChildSize;
     private TextViewWithCircularIndicator mSelectedView;
 
     public YearPickerView(Context context, DatePickerController controller) {
@@ -88,7 +90,7 @@ public class YearPickerView extends ListView implements OnItemClickListener, Dat
     }
 
     private static int getYearFromTextView(TextView view) {
-        return Integer.valueOf(view.getText().toString());
+        return Integer.parseInt(view.getText().toString());
     }
 
     private final class YearAdapter extends BaseAdapter {

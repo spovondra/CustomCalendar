@@ -24,19 +24,19 @@ import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
-import androidx.customview.widget.ExploreByTouchHelper;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
+import androidx.customview.widget.ExploreByTouchHelper;
 
 import com.example.myapplication.R;
 
@@ -45,6 +45,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * A calendar-like view displaying a specified month and the appropriate selectable day numbers
@@ -52,7 +53,6 @@ import java.util.Locale;
  */
 public abstract class MonthView extends View {
 
-    protected static int DEFAULT_HEIGHT = 32;
     protected static final int DEFAULT_SELECTED_DAY = -1;
     protected static final int DEFAULT_WEEK_START = Calendar.SUNDAY;
     protected static final int DEFAULT_NUM_DAYS = 7;
@@ -74,10 +74,10 @@ public abstract class MonthView extends View {
     protected DatePickerController mController;
 
     // affects the padding on the sides of this view
-    protected int mEdgePadding = 0;
+    protected int mEdgePadding;
 
-    private String mDayOfWeekTypeface;
-    private String mMonthTitleTypeface;
+    private final String mDayOfWeekTypeface;
+    private final String mMonthTitleTypeface;
 
     protected Paint mMonthNumPaint;
     protected Paint mMonthTitlePaint;
@@ -92,7 +92,7 @@ public abstract class MonthView extends View {
     // Quick reference to the width of this view, matches parent
     protected int mWidth;
     // The height this view should draw at in pixels, set by height param
-    protected int mRowHeight = DEFAULT_HEIGHT;
+    protected int mRowHeight;
     // If this view contains the today
     protected boolean mHasToday = false;
     // Which day is selected [0-6] or -1 if no day is selected
@@ -116,7 +116,7 @@ public abstract class MonthView extends View {
     protected OnDayClickListener mOnDayClickListener;
 
     // Whether to prevent setting the accessibility delegate
-    private boolean mLockAccessibilityDelegate;
+    private final boolean mLockAccessibilityDelegate;
 
     protected int mDayTextColor;
     protected int mSelectedDayTextColor;
@@ -221,13 +221,11 @@ public abstract class MonthView extends View {
 
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_UP:
-                final int day = getDayFromLocation(event.getX(), event.getY());
-                if (day >= 0) {
-                    onDayClick(day);
-                }
-                break;
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            final int day = getDayFromLocation(event.getX(), event.getY());
+            if (day >= 0) {
+                onDayClick(day);
+            }
         }
         return true;
     }
@@ -273,7 +271,7 @@ public abstract class MonthView extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) {
         drawMonthTitle(canvas);
         drawMonthDayLabels(canvas);
         drawMonthNums(canvas);
@@ -299,8 +297,6 @@ public abstract class MonthView extends View {
         mYear = year;
 
         // Figure out what day today is
-        //final Time today = new Time(Time.getCurrentTimezone());
-        //today.setToNow();
         final Calendar today = Calendar.getInstance(mController.getTimeZone(), mController.getLocale());
         mHasToday = false;
         mToday = -1;
@@ -405,8 +401,7 @@ public abstract class MonthView extends View {
         Locale locale = mController.getLocale();
         String pattern = "MMMM yyyy";
 
-        if (Build.VERSION.SDK_INT < 18) pattern = getContext().getResources().getString(R.string.mdtp_date_v1_monthyear);
-        else pattern = DateFormat.getBestDateTimePattern(locale, pattern);
+        pattern = DateFormat.getBestDateTimePattern(locale, pattern);
 
         SimpleDateFormat formatter = new SimpleDateFormat(pattern, locale);
         formatter.setTimeZone(mController.getTimeZone());
@@ -571,38 +566,6 @@ public abstract class MonthView extends View {
         Locale locale = mController.getLocale();
 
         // Localised short version of the string is not available on API < 18
-        if (Build.VERSION.SDK_INT < 18) {
-            String dayName = new SimpleDateFormat("E", locale).format(day.getTime());
-            String dayLabel = dayName.toUpperCase(locale).substring(0, 1);
-
-            // Chinese labels should be fetched right to left
-            if (locale.equals(Locale.CHINA) || locale.equals(Locale.CHINESE) || locale.equals(Locale.SIMPLIFIED_CHINESE) || locale.equals(Locale.TRADITIONAL_CHINESE)) {
-                int len = dayName.length();
-                dayLabel = dayName.substring(len - 1, len);
-            }
-
-            // Most hebrew labels should select the second to last character
-            if (locale.getLanguage().equals("he") || locale.getLanguage().equals("iw")) {
-                if (mDayLabelCalendar.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) {
-                    int len = dayName.length();
-                    dayLabel = dayName.substring(len - 2, len - 1);
-                } else {
-                    // I know this is duplication, but it makes the code easier to grok by
-                    // having all hebrew code in the same block
-                    dayLabel = dayName.toUpperCase(locale).substring(0, 1);
-                }
-            }
-
-            // Catalan labels should be two digits in lowercase
-            if (locale.getLanguage().equals("ca"))
-                dayLabel = dayName.toLowerCase().substring(0, 2);
-
-            // Correct single character label in Spanish is X
-            if (locale.getLanguage().equals("es") && day.get(Calendar.DAY_OF_WEEK) == Calendar.WEDNESDAY)
-                dayLabel = "X";
-
-            return dayLabel;
-        }
         // Getting the short label is a one liner on API >= 18
         if (weekDayLabelFormatter == null) {
             weekDayLabelFormatter = new SimpleDateFormat("EEEEE", locale);
@@ -620,14 +583,6 @@ public abstract class MonthView extends View {
             return new MonthAdapter.CalendarDay(mYear, mMonth, day, mController.getTimeZone());
         }
         return null;
-    }
-
-    /**
-     * Clears accessibility focus within the view. No-op if the view does not
-     * contain accessibility focus.
-     */
-    public void clearAccessibilityFocus() {
-        mTouchHelper.clearFocusedVirtualView();
     }
 
     /**
@@ -660,18 +615,8 @@ public abstract class MonthView extends View {
         }
 
         void setFocusedVirtualView(int virtualViewId) {
-            getAccessibilityNodeProvider(MonthView.this).performAction(
+            Objects.requireNonNull(getAccessibilityNodeProvider(MonthView.this)).performAction(
                     virtualViewId, AccessibilityNodeInfoCompat.ACTION_ACCESSIBILITY_FOCUS, null);
-        }
-
-        void clearFocusedVirtualView() {
-            final int focusedVirtualView = getAccessibilityFocusedVirtualViewId();
-            if (focusedVirtualView != ExploreByTouchHelper.INVALID_ID) {
-                getAccessibilityNodeProvider(MonthView.this).performAction(
-                        focusedVirtualView,
-                        AccessibilityNodeInfoCompat.ACTION_CLEAR_ACCESSIBILITY_FOCUS,
-                        null);
-            }
         }
 
         @Override
@@ -716,10 +661,9 @@ public abstract class MonthView extends View {
         @Override
         protected boolean onPerformActionForVirtualView(int virtualViewId, int action,
                                                         Bundle arguments) {
-            switch (action) {
-                case AccessibilityNodeInfo.ACTION_CLICK:
-                    onDayClick(virtualViewId);
-                    return true;
+            if (action == AccessibilityNodeInfo.ACTION_CLICK) {
+                onDayClick(virtualViewId);
+                return true;
             }
 
             return false;

@@ -17,16 +17,15 @@
 
 package com.example.myapplication.customCalendar;
 
-import android.os.Build;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.LinearSnapHelper;
+import android.view.Gravity;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.OrientationHelper;
 import androidx.recyclerview.widget.RecyclerView;
-import android.view.Gravity;
-import android.view.View;
 
 /**
  * Enables snapping better snapping in a RecyclerView
@@ -37,23 +36,18 @@ public class GravitySnapHelper extends LinearSnapHelper {
 
     private OrientationHelper verticalHelper;
     private OrientationHelper horizontalHelper;
-    private int gravity;
+    private final int gravity;
     private boolean isRtlHorizontal;
-    private SnapListener listener;
-    private boolean snapping;
-    private RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener() {
+    private final SnapListener listener;
+    private final RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
             super.onScrollStateChanged(recyclerView, newState);
-            if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
-                snapping = false;
-            }
             if (newState == RecyclerView.SCROLL_STATE_IDLE && listener != null) {
                 int position = getSnappedPosition(recyclerView);
                 if (position != RecyclerView.NO_POSITION) {
                     listener.onSnap(position);
                 }
-                snapping = false;
             }
         }
     };
@@ -77,8 +71,7 @@ public class GravitySnapHelper extends LinearSnapHelper {
     public void attachToRecyclerView(@Nullable RecyclerView recyclerView)
             throws IllegalStateException {
         if (recyclerView != null) {
-            if ((gravity == Gravity.START || gravity == Gravity.END)
-                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            if (gravity == Gravity.START || gravity == Gravity.END) {
                 isRtlHorizontal
                         = recyclerView.getContext().getResources().getConfiguration()
                         .getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
@@ -101,8 +94,6 @@ public class GravitySnapHelper extends LinearSnapHelper {
             } else { // END
                 out[0] = distanceToEnd(targetView, getHorizontalHelper(layoutManager), false);
             }
-        } else {
-            out[0] = 0;
         }
 
         if (layoutManager.canScrollVertically()) {
@@ -111,8 +102,6 @@ public class GravitySnapHelper extends LinearSnapHelper {
             } else { // BOTTOM
                 out[1] = distanceToEnd(targetView, getVerticalHelper(layoutManager), false);
             }
-        } else {
-            out[1] = 0;
         }
 
         return out;
@@ -137,7 +126,6 @@ public class GravitySnapHelper extends LinearSnapHelper {
                     break;
             }
         }
-        snapping = snapView != null;
         return snapView;
     }
 

@@ -98,7 +98,7 @@ public class TextViewWithCircularIndicator extends androidx.appcompat.widget.App
             final int width = getWidth();
             final int height = getHeight();
             int radius = Math.min(width, height) / 2;
-            canvas.drawCircle(width / 2, height / 2, radius, mCirclePaint);
+            canvas.drawCircle((float) width / 2, (float) height / 2, radius, mCirclePaint);
         }
         setSelected(mDrawCircle);
         super.onDraw(canvas);

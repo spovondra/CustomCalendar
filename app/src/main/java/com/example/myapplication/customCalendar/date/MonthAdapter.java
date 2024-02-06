@@ -16,6 +16,7 @@
 
 package com.example.myapplication.customCalendar.date;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -121,6 +122,7 @@ public abstract class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.Mon
      *
      * @param day The day to highlight
      */
+    @SuppressLint("NotifyDataSetChanged")
     public void setSelectedDay(CalendarDay day) {
         mSelectedDay = day;
         notifyDataSetChanged();

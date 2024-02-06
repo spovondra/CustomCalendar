@@ -17,16 +17,11 @@
 package com.example.myapplication.customCalendar.date;
 
 import android.content.Context;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,6 +30,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myapplication.customCalendar.GravitySnapHelper;
 import com.example.myapplication.customCalendar.Utils;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.Objects;
 
 /**
  * This displays a list of months in a calendar format with selectable days.
@@ -69,9 +69,7 @@ public abstract class DayPickerView extends RecyclerView implements DatePickerDi
 
     public DayPickerView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        DatePickerDialog.ScrollOrientation scrollOrientation = Build.VERSION.SDK_INT < Build.VERSION_CODES.M
-                ? DatePickerDialog.ScrollOrientation.VERTICAL
-                : DatePickerDialog.ScrollOrientation.HORIZONTAL;
+        DatePickerDialog.ScrollOrientation scrollOrientation = DatePickerDialog.ScrollOrientation.HORIZONTAL;
         init(context, scrollOrientation);
     }
 
@@ -174,9 +172,8 @@ public abstract class DayPickerView extends RecyclerView implements DatePickerDi
      * @param setSelected Whether to set the given time as selected
      * @param forceScroll Whether to recenter even if the time is already
      *                    visible
-     * @return Whether or not the view animated to the new location
      */
-    public boolean goTo(MonthAdapter.CalendarDay day, boolean animate, boolean setSelected, boolean forceScroll) {
+    public void goTo(MonthAdapter.CalendarDay day, boolean animate, boolean setSelected, boolean forceScroll) {
 
         // Set the selected day
         if (setSelected) {
@@ -190,7 +187,7 @@ public abstract class DayPickerView extends RecyclerView implements DatePickerDi
 
         View child;
         int i = 0;
-        int top = 0;
+        int top;
         // Find a child that's completely in the view
         do {
             child = getChildAt(i++);
@@ -221,20 +218,18 @@ public abstract class DayPickerView extends RecyclerView implements DatePickerDi
             if (animate) {
                 smoothScrollToPosition(position);
                 if (pageListener != null) pageListener.onPageChanged(position);
-                return true;
             } else {
                 postSetSelection(position);
             }
         } else if (setSelected) {
             setMonthDisplayed(mSelectedDay);
         }
-        return false;
     }
 
     public void postSetSelection(final int position) {
         clearFocus();
         post(() -> {
-            ((LinearLayoutManager) getLayoutManager()).scrollToPositionWithOffset(position, 0);
+            ((LinearLayoutManager) Objects.requireNonNull(getLayoutManager())).scrollToPositionWithOffset(position, 0);
 
             // Set initial accessibility focus to selected day
             restoreAccessibilityFocus(mSelectedDay);
@@ -255,7 +250,7 @@ public abstract class DayPickerView extends RecyclerView implements DatePickerDi
      * Gets the position of the view that is most prominently displayed within the list.
      */
     public int getMostVisiblePosition() {
-        return getChildAdapterPosition(getMostVisibleMonth());
+        return getChildAdapterPosition(Objects.requireNonNull(getMostVisibleMonth()));
     }
 
     public @Nullable MonthView getMostVisibleMonth() {
@@ -309,10 +304,6 @@ public abstract class DayPickerView extends RecyclerView implements DatePickerDi
             if (child instanceof MonthView) {
                 final MonthAdapter.CalendarDay focus = ((MonthView) child).getAccessibilityFocus();
                 if (focus != null) {
-                    if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                        // Clear focus to avoid ListView bug in Jelly Bean MR1.
-                        ((MonthView) child).clearAccessibilityFocus();
-                    }
                     return focus;
                 }
             }
@@ -326,11 +317,10 @@ public abstract class DayPickerView extends RecyclerView implements DatePickerDi
      * {@code day} is {@code null}.
      *
      * @param day The date that should receive accessibility focus
-     * @return {@code true} if focus was restored
      */
-    private boolean restoreAccessibilityFocus(MonthAdapter.CalendarDay day) {
+    private void restoreAccessibilityFocus(MonthAdapter.CalendarDay day) {
         if (day == null) {
-            return false;
+            return;
         }
 
         final int childCount = getChildCount();
@@ -338,12 +328,11 @@ public abstract class DayPickerView extends RecyclerView implements DatePickerDi
             final View child = getChildAt(i);
             if (child instanceof MonthView) {
                 if (((MonthView) child).restoreAccessibilityFocus(day)) {
-                    return true;
+                    return;
                 }
             }
         }
 
-        return false;
     }
 
     @Override

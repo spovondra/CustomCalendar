@@ -91,10 +91,6 @@ public class DayPickerGroup extends ViewGroup
         dayPickerView.onChange();
     }
 
-    public void onDateChanged() {
-        dayPickerView.onDateChanged();
-    }
-
     public void postSetSelection(int position) {
         dayPickerView.postSetSelection(position);
     }

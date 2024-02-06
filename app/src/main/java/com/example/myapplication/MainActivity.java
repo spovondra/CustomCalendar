@@ -3,8 +3,6 @@ package com.example.myapplication;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;

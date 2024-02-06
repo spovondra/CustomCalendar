@@ -17,7 +17,7 @@
 package com.example.myapplication.customCalendar.date;
 
 import android.os.Parcel;
-import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -85,47 +85,8 @@ class DefaultDateRangeLimiter implements DateRangeLimiter {
         }
     }
 
-    void setDisabledDays(@NonNull Calendar[] days) {
-        for (Calendar disabledDay : days) {
-            this.disabledDays.add(Utils.trimToMidnight((Calendar) disabledDay.clone()));
-        }
-    }
-
-    void setMinDate(@NonNull Calendar calendar) {
-        mMinDate = Utils.trimToMidnight((Calendar) calendar.clone());
-    }
-
-    void setMaxDate(@NonNull Calendar calendar) {
-        mMaxDate = Utils.trimToMidnight((Calendar) calendar.clone());
-    }
-
     void setController(@NonNull DatePickerController controller) {
         mController = controller;
-    }
-
-    void setYearRange(int startYear, int endYear) {
-        if (endYear < startYear) {
-            throw new IllegalArgumentException("Year end must be larger than or equal to year start");
-        }
-
-        mMinYear = startYear;
-        mMaxYear = endYear;
-    }
-
-    @Nullable Calendar getMinDate() {
-        return mMinDate;
-    }
-
-    @Nullable Calendar getMaxDate() {
-        return mMaxDate;
-    }
-
-    @Nullable Calendar[] getSelectableDays() {
-         return selectableDays.isEmpty() ? null : selectableDays.toArray(new Calendar[0]);
-    }
-
-    @Nullable Calendar[] getDisabledDays() {
-        return disabledDays.isEmpty() ? null : disabledDays.toArray(new Calendar[0]);
     }
 
     @Override

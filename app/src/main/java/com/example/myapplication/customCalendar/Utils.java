@@ -22,12 +22,10 @@ import android.animation.PropertyValuesHolder;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.graphics.Color;
-import android.os.Build;
-import androidx.annotation.AttrRes;
-import androidx.core.content.ContextCompat;
 import android.util.TypedValue;
 import android.view.View;
+
+import androidx.annotation.AttrRes;
 
 import com.example.myapplication.R;
 
@@ -41,12 +39,6 @@ public class Utils {
 
     //public static final int MONDAY_BEFORE_JULIAN_EPOCH = Time.EPOCH_JULIAN_DAY - 3;
     public static final int PULSE_ANIMATOR_DURATION = 544;
-
-    // Alpha level for time picker selection.
-    public static final int SELECTED_ALPHA = 255;
-    public static final int SELECTED_ALPHA_THEME_DARK = 255;
-    // Alpha level for fully opaque.
-    public static final int FULL_ALPHA = 255;
 
     /**
      * Try to speak the specified text, for accessibility. Only available on JB or later.
@@ -88,13 +80,6 @@ public class Utils {
         return (int) px;
     }
 
-    public static int darkenColor(int color) {
-        float[] hsv = new float[3];
-        Color.colorToHSV(color, hsv);
-        hsv[2] = hsv[2] * 0.8f; // value component
-        return Color.HSVToColor(hsv);
-    }
-
     /**
      * Gets the colorAccent from the current context, if possible/available
      * @param context The context to use as reference for the color
@@ -103,25 +88,11 @@ public class Utils {
     public static int getAccentColorFromThemeIfAvailable(Context context) {
         TypedValue typedValue = new TypedValue();
         // First, try the android:colorAccent
-        if (Build.VERSION.SDK_INT >= 21) {
-            context.getTheme().resolveAttribute(android.R.attr.colorAccent, typedValue, true);
-            return typedValue.data;
-        }
+        context.getTheme().resolveAttribute(android.R.attr.colorAccent, typedValue, true);
+        return typedValue.data;
         // Next, try colorAccent from support lib
-        int colorAccentResId = context.getResources().getIdentifier("colorAccent", "attr", context.getPackageName());
-        if (colorAccentResId != 0 && context.getTheme().resolveAttribute(colorAccentResId, typedValue, true)) {
-            return typedValue.data;
-        }
-        // Return the value in mdtp_accent_color
-        return ContextCompat.getColor(context, R.color.mdtp_accent_color);
     }
 
-    /**
-     * Gets dialog type (Light/Dark) from current theme
-     * @param context The context to use as reference for the boolean
-     * @param current Default value to return if cannot resolve the attribute
-     * @return true if dark mode, false if light.
-     */
     public static boolean isDarkTheme(Context context, boolean current) {
         return resolveBoolean(context, R.attr.mdtp_theme_dark, current);
     }
