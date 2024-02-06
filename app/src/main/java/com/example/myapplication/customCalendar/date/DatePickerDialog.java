@@ -117,11 +117,6 @@ public class DatePickerDialog extends AppCompatDialogFragment implements
 
     private AccessibleDateAnimator mAnimator;
 
-    private TextView mDatePickerHeaderView;
-    private LinearLayout mMonthAndDayView;
-    private TextView mSelectedMonthTextView;
-    private TextView mSelectedDayTextView;
-    private TextView mYearView;
     private DayPickerGroup mDayPickerView;
     private YearPickerView mYearPickerView;
 
@@ -358,18 +353,10 @@ public class DatePickerDialog extends AppCompatDialogFragment implements
 
         mDefaultLimiter.setController(this);
 
-        int viewRes = mVersion == Version.VERSION_1 ? R.layout.mdtp_date_picker_dialog : R.layout.mdtp_date_picker_dialog_v2;
+        int viewRes = R.layout.mdtp_date_picker_dialog_v2;
         View view = inflater.inflate(viewRes, container, false);
         // All options have been set at this point: round the initial selection if necessary
         mCalendar = mDateRangeLimiter.setToNearestDate(mCalendar);
-
-        mDatePickerHeaderView = view.findViewById(R.id.mdtp_date_picker_header);
-        mMonthAndDayView = view.findViewById(R.id.mdtp_date_picker_month_and_day);
-        mMonthAndDayView.setOnClickListener(this);
-        mSelectedMonthTextView = view.findViewById(R.id.mdtp_date_picker_month);
-        mSelectedDayTextView = view.findViewById(R.id.mdtp_date_picker_day);
-        mYearView = view.findViewById(R.id.mdtp_date_picker_year);
-        mYearView.setOnClickListener(this);
 
         final Activity activity = requireActivity();
         mDayPickerView = new DayPickerGroup(activity, this);
@@ -403,50 +390,13 @@ public class DatePickerDialog extends AppCompatDialogFragment implements
         animation2.setDuration(ANIMATION_DURATION);
         mAnimator.setOutAnimation(animation2);
 
-        Button okButton = view.findViewById(R.id.mdtp_ok);
-        okButton.setOnClickListener(v -> {
-            tryVibrate();
-            notifyOnDateListener();
-            dismiss();
-        });
-        okButton.setTypeface(ResourcesCompat.getFont(activity, R.font.robotomedium));
-        if (mOkString != null) okButton.setText(mOkString);
-        else okButton.setText(mOkResid);
-
-        Button cancelButton = view.findViewById(R.id.mdtp_cancel);
-        cancelButton.setOnClickListener(v -> {
-            tryVibrate();
-            if (getDialog() != null) getDialog().cancel();
-        });
-        cancelButton.setTypeface(ResourcesCompat.getFont(activity, R.font.robotomedium));
-        if (mCancelString != null) cancelButton.setText(mCancelString);
-        else cancelButton.setText(mCancelResid);
-        cancelButton.setVisibility(isCancelable() ? View.VISIBLE : View.GONE);
 
         // If an accent color has not been set manually, get it from the context
         if (mAccentColor == null) {
             mAccentColor = Utils.getAccentColorFromThemeIfAvailable(getActivity());
         }
-        if (mDatePickerHeaderView != null) mDatePickerHeaderView.setBackgroundColor(Utils.darkenColor(mAccentColor));
-        view.findViewById(R.id.mdtp_day_picker_selected_date_layout).setBackgroundColor(mAccentColor);
-
-        // Buttons can have a different color
-        if (mOkColor == null) {
-            mOkColor = mAccentColor;
-        }
-        okButton.setTextColor(mOkColor);
-
-        if (mCancelColor == null) {
-            mCancelColor = mAccentColor;
-        }
-        cancelButton.setTextColor(mCancelColor);
-
-        if (getDialog() == null) {
-            view.findViewById(R.id.mdtp_done_background).setVisibility(View.GONE);
-        }
 
         updateDisplay(false);
-        setCurrentView(currentView);
 
         if (listPosition != -1) {
             if (currentView == MONTH_AND_DAY_VIEW) {
@@ -493,103 +443,13 @@ public class DatePickerDialog extends AppCompatDialogFragment implements
         if (mOnDismissListener != null) mOnDismissListener.onDismiss(dialog);
     }
 
-    private void setCurrentView(final int viewIndex) {
-        long millis = mCalendar.getTimeInMillis();
-
-        switch (viewIndex) {
-            case MONTH_AND_DAY_VIEW:
-                if (mVersion == Version.VERSION_1) {
-                    ObjectAnimator pulseAnimator = Utils.getPulseAnimator(mMonthAndDayView, 0.9f,
-                            1.05f);
-                    if (mDelayAnimation) {
-                        pulseAnimator.setStartDelay(ANIMATION_DELAY);
-                        mDelayAnimation = false;
-                    }
-                    if (mCurrentView != viewIndex) {
-                        mMonthAndDayView.setSelected(true);
-                        mYearView.setSelected(false);
-                        mAnimator.setDisplayedChild(MONTH_AND_DAY_VIEW);
-                        mCurrentView = viewIndex;
-                    }
-                    mDayPickerView.onDateChanged();
-                    pulseAnimator.start();
-                } else {
-                    if (mCurrentView != viewIndex) {
-                        mMonthAndDayView.setSelected(true);
-                        mYearView.setSelected(false);
-                        mAnimator.setDisplayedChild(MONTH_AND_DAY_VIEW);
-                        mCurrentView = viewIndex;
-                    }
-                    mDayPickerView.onDateChanged();
-                }
-
-                int flags = DateUtils.FORMAT_SHOW_DATE;
-                String dayString = DateUtils.formatDateTime(getActivity(), millis, flags);
-                mAnimator.setContentDescription(mDayPickerDescription + ": " + dayString);
-                Utils.tryAccessibilityAnnounce(mAnimator, mSelectDay);
-                break;
-            case YEAR_VIEW:
-                if (mVersion == Version.VERSION_1) {
-                    ObjectAnimator pulseAnimator = Utils.getPulseAnimator(mYearView, 0.85f, 1.1f);
-                    if (mDelayAnimation) {
-                        pulseAnimator.setStartDelay(ANIMATION_DELAY);
-                        mDelayAnimation = false;
-                    }
-                    mYearPickerView.onDateChanged();
-                    if (mCurrentView != viewIndex) {
-                        mMonthAndDayView.setSelected(false);
-                        mYearView.setSelected(true);
-                        mAnimator.setDisplayedChild(YEAR_VIEW);
-                        mCurrentView = viewIndex;
-                    }
-                    pulseAnimator.start();
-                } else {
-                    mYearPickerView.onDateChanged();
-                    if (mCurrentView != viewIndex) {
-                        mMonthAndDayView.setSelected(false);
-                        mYearView.setSelected(true);
-                        mAnimator.setDisplayedChild(YEAR_VIEW);
-                        mCurrentView = viewIndex;
-                    }
-                }
-
-                CharSequence yearString = YEAR_FORMAT.format(millis);
-                mAnimator.setContentDescription(mYearPickerDescription + ": " + yearString);
-                Utils.tryAccessibilityAnnounce(mAnimator, mSelectYear);
-                break;
-        }
-    }
 
     private void updateDisplay(boolean announce) {
-        mYearView.setText(YEAR_FORMAT.format(mCalendar.getTime()));
-
-        if (mVersion == Version.VERSION_1) {
-            if (mDatePickerHeaderView != null) {
-                if (mTitle != null)
-                    mDatePickerHeaderView.setText(mTitle);
-                else {
-                    mDatePickerHeaderView.setText(mCalendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG,
-                            mLocale));
-                }
-            }
-            mSelectedMonthTextView.setText(MONTH_FORMAT.format(mCalendar.getTime()));
-            mSelectedDayTextView.setText(DAY_FORMAT.format(mCalendar.getTime()));
-        }
-
-        if (mVersion == Version.VERSION_2) {
-            mSelectedDayTextView.setText(VERSION_2_FORMAT.format(mCalendar.getTime()));
-            if (mTitle != null)
-                mDatePickerHeaderView.setText(mTitle.toUpperCase(mLocale));
-            else
-                mDatePickerHeaderView.setVisibility(View.GONE);
-        }
-
         // Accessibility.
         long millis = mCalendar.getTimeInMillis();
         mAnimator.setDateMillis(millis);
         int flags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NO_YEAR;
         String monthAndDayText = DateUtils.formatDateTime(getActivity(), millis, flags);
-        mMonthAndDayView.setContentDescription(monthAndDayText);
 
         if (announce) {
             flags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR;
@@ -1002,12 +862,6 @@ public class DatePickerDialog extends AppCompatDialogFragment implements
 
     @Override
     public void onClick(View v) {
-        tryVibrate();
-        if (v.getId() == R.id.mdtp_date_picker_year) {
-            setCurrentView(YEAR_VIEW);
-        } else if (v.getId() == R.id.mdtp_date_picker_month_and_day) {
-            setCurrentView(MONTH_AND_DAY_VIEW);
-        }
         notifyOnDateListener();
     }
 
@@ -1016,7 +870,6 @@ public class DatePickerDialog extends AppCompatDialogFragment implements
         mCalendar.set(Calendar.YEAR, year);
         mCalendar = adjustDayInMonthIfNeeded(mCalendar);
         updatePickers();
-        setCurrentView(MONTH_AND_DAY_VIEW);
         updateDisplay(true);
     }
 
