@@ -22,7 +22,6 @@ import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
@@ -36,6 +35,7 @@ import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
@@ -111,7 +111,7 @@ public class DatePickerDialog extends AppCompatDialogFragment implements
 
     private Calendar mCalendar = Utils.trimToMidnight(Calendar.getInstance(getTimeZone()));
     private OnDateSetListener mCallBack;
-    private HashSet<OnDateChangedListener> mListeners = new HashSet<>();
+    private final HashSet<OnDateChangedListener> mListeners = new HashSet<>();
     private DialogInterface.OnCancelListener mOnCancelListener;
     private DialogInterface.OnDismissListener mOnDismissListener;
 
@@ -232,7 +232,7 @@ public class DatePickerDialog extends AppCompatDialogFragment implements
         //noinspection deprecation
         setTimeZone(mCalendar.getTimeZone());
 
-        mVersion = Build.VERSION.SDK_INT < Build.VERSION_CODES.M ? Version.VERSION_1 : Version.VERSION_2;
+        mVersion = Version.VERSION_2;
     }
 
     public void initialize(OnDateSetListener callBack, int year, int monthOfYear, int dayOfMonth) {
@@ -257,11 +257,7 @@ public class DatePickerDialog extends AppCompatDialogFragment implements
             mCalendar.set(Calendar.DAY_OF_MONTH, savedInstanceState.getInt(KEY_SELECTED_DAY));
             mDefaultView = savedInstanceState.getInt(KEY_DEFAULT_VIEW);
         }
-        if (Build.VERSION.SDK_INT < 18) {
-            VERSION_2_FORMAT = new SimpleDateFormat(activity.getResources().getString(R.string.mdtp_date_v2_daymonthyear), mLocale);
-        } else {
-            VERSION_2_FORMAT = new SimpleDateFormat(DateFormat.getBestDateTimePattern(mLocale, "EEEMMMdd"), mLocale);
-        }
+        VERSION_2_FORMAT = new SimpleDateFormat(DateFormat.getBestDateTimePattern(mLocale, "EEEMMMdd"), mLocale);
         VERSION_2_FORMAT.setTimeZone(getTimeZone());
     }
 
@@ -464,7 +460,7 @@ public class DatePickerDialog extends AppCompatDialogFragment implements
     }
 
     @Override
-    public void onConfigurationChanged(final Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull final Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         ViewGroup viewGroup = (ViewGroup) getView();
         if (viewGroup != null) {
@@ -486,13 +482,13 @@ public class DatePickerDialog extends AppCompatDialogFragment implements
     }
 
     @Override
-    public void onCancel(DialogInterface dialog) {
+    public void onCancel(@NonNull DialogInterface dialog) {
         super.onCancel(dialog);
         if (mOnCancelListener != null) mOnCancelListener.onCancel(dialog);
     }
 
     @Override
-    public void onDismiss(DialogInterface dialog) {
+    public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
         if (mOnDismissListener != null) mOnDismissListener.onDismiss(dialog);
     }
@@ -603,15 +599,6 @@ public class DatePickerDialog extends AppCompatDialogFragment implements
     }
 
     /**
-     * Set whether the device should vibrate when touching fields
-     *
-     * @param vibrate true if the device should vibrate when touching a field
-     */
-    public void vibrate(boolean vibrate) {
-        mVibrate = vibrate;
-    }
-
-    /**
      * Set whether the picker should dismiss itself when being paused or whether it should try to survive an orientation change
      *
      * @param dismissOnPause true if the dialog should dismiss itself when it's pausing
@@ -717,15 +704,6 @@ public class DatePickerDialog extends AppCompatDialogFragment implements
     @Override
     public int getAccentColor() {
         return mAccentColor;
-    }
-
-    /**
-     * Set whether the year picker of the month and day picker is shown first
-     *
-     * @param yearPicker boolean
-     */
-    public void showYearPickerFirst(boolean yearPicker) {
-        mDefaultView = yearPicker ? YEAR_VIEW : MONTH_AND_DAY_VIEW;
     }
 
     @SuppressWarnings("unused")
@@ -879,15 +857,6 @@ public class DatePickerDialog extends AppCompatDialogFragment implements
     }
 
     /**
-     * Set a title to be displayed instead of the weekday
-     *
-     * @param title String - The title to be displayed
-     */
-    public void setTitle(String title) {
-        mTitle = title;
-    }
-
-    /**
      * Set the label for the Ok button (max 12 characters)
      *
      * @param okString A literal String to be used as the Ok button label
@@ -948,14 +917,6 @@ public class DatePickerDialog extends AppCompatDialogFragment implements
     }
 
     /**
-     * Set which way the user needs to swipe to switch months in the MonthView
-     * @param orientation The orientation to use
-     */
-    public void setScrollOrientation(ScrollOrientation orientation) {
-        mScrollOrientation = orientation;
-    }
-
-    /**
      * Get which way the user needs to swipe to switch months in the MonthView
      * @return SwipeOrientation
      */
@@ -965,7 +926,7 @@ public class DatePickerDialog extends AppCompatDialogFragment implements
 
     /**
      * Set which timezone the picker should use
-     *
+     * <p>
      * This has been deprecated in favor of setting the TimeZone using the constructor that
      * takes a Calendar object
      * @param timeZone The timezone to use
