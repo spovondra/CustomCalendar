@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+     Copyright (C) 2013 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+ -->
+
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="mdtp_done_label" msgid="7007948707597430919">"Hotovo"</string>
+    <string name="mdtp_hour_picker_description" msgid="7586639618712934060">"Kruhový posuvník hodin"</string>
+    <string name="mdtp_minute_picker_description" msgid="6024811202872705251">"Kruhový posuvník minut"</string>
+    <string name="mdtp_select_hours" msgid="7651068754188418859">"Zvolte hodiny"</string>
+    <string name="mdtp_select_minutes" msgid="8327182090226828481">"Zvolte minuty"</string>
+    <string name="mdtp_day_picker_description" msgid="3968620852217927702">"Dny uspořádané po měsících"</string>
+    <string name="mdtp_year_picker_description" msgid="6963340404644587098">"Seznam roků"</string>
+    <string name="mdtp_select_day" msgid="3973338219107019769">"Vyberte měsíc a den"</string>
+    <string name="mdtp_select_year" msgid="2603330600102539372">"Vyberte rok"</string>
+    <string name="mdtp_item_is_selected" msgid="2674929164900463786">"Vybrána položka <xliff:g id="ITEM">%1$s</xliff:g>"</string>
+    <string name="mdtp_deleted_key" msgid="6908431551612331381">"<xliff:g id="KEY">%1$s</xliff:g> smazáno"</string>
+    <string name="mdtp_date_v1_monthyear">LLLL yyyy</string>
+    <string name="mdtp_date_v2_daymonthyear">EEE dd. M.</string>
+
+    <string name="app_name" translatable="false">Material DateTimePicker</string>
+    <string name="title_activity_main">DateTimePicker Example</string>
+    <string name="selected_time">The time you picked will be shown here.</string>
+    <string name="selected_date">The date you picked will be shown here.</string>
+    <string name="selected_datetime">The date and time you picked will be shown here.</string>
+    <string name="pick_time">Pick Time</string>
+    <string name="pick_date">Pick Date</string>
+    <string name="original_button">Framework Picker</string>
+    <string name="pick_datetime">Pick Date+Time</string>
+    <string name="mode_24_hours">Use 24 hour mode</string>
+    <string name="mode_dark">Use dark theme</string>
+    <string name="mode_custom_accent">Use custom accent</string>
+    <string name="vibrate">Vibrate on touch</string>
+    <string name="dismiss">Dismiss on pause (eg: orientation change)</string>
+    <string name="title">Show a title</string>
+    <string name="show_version_2">Use marshmallow layout</string>
+    <string name="show_year_first">Show the year picker first</string>
+    <string name="enable_seconds">Show seconds picker</string>
+    <string name="enable_minutes">Show minutes picker</string>
+    <string name="limit_times">Limit selectable times</string>
+    <string name="limit_dates">Limit selectable dates</string>
+    <string name="disable_dates">Disable specific dates</string>
+    <string name="disable_times">Disable specific times</string>
+    <string name="highlight_dates">Highlight certain dates</string>
+    <string name="switch_orientation">Switch scroll orientation</string>
+    <string name="default_selection">Use alternative default selection</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="tab_title_time">Time</string>
+    <string name="tab_title_date">Date</string>
+    <string name="tab_title_datetime">Date+Time</string>
+</resources>
