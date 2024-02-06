@@ -1008,6 +1008,7 @@ public class DatePickerDialog extends AppCompatDialogFragment implements
         } else if (v.getId() == R.id.mdtp_date_picker_month_and_day) {
             setCurrentView(MONTH_AND_DAY_VIEW);
         }
+        notifyOnDateListener();
     }
 
     @Override
@@ -1026,10 +1027,7 @@ public class DatePickerDialog extends AppCompatDialogFragment implements
         mCalendar.set(Calendar.DAY_OF_MONTH, day);
         updatePickers();
         updateDisplay(true);
-        if (mAutoDismiss) {
-            notifyOnDateListener();
-            dismiss();
-        }
+        notifyOnDateListener();
     }
 
     private void updatePickers() {
